@@ -1,0 +1,10 @@
+swagger: "2.0"
+info:
+  title: Legal Eagle Backend API
+  description: Modular monolith Go + PostgreSQL backend for Legal Eagle.
+  version: "1.0.0"
+host: localhost:8080
+basePath: /api/v1
+schemes:
+  - http
+

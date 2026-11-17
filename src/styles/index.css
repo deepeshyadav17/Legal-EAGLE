@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+/* ---------- Design tokens ---------- */
+@theme {
+  --color-navy: #17314d;
+  --color-navy-800: #20415e;
+  --color-navy-700: #2b5570;
+  --color-gold: #e3aa65;
+  --color-gold-600: #a96c3d;
+  --color-gold-100: #fff1df;
+  --color-cream: #f2f6fb;
+  --color-surface: #ffffff;
+  --color-ink: #273440;
+  --color-muted: #68737d;
+  --color-line: #dfe7ef;
+
+  --font-sans: "Inter", "Segoe UI", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
+
+  --shadow-card: 0 6px 20px rgb(23 49 77 / 0.06);
+  --shadow-lift: 0 12px 30px rgb(23 49 77 / 0.14);
+
+  --animate-fade-up: fade-up 0.45s ease-out both;
+  --animate-shimmer: shimmer 1.4s linear infinite;
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer {
+    from { background-position: -400px 0; }
+    to { background-position: 400px 0; }
+  }
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-cream text-ink font-sans antialiased;
+  }
+  button, input, select, textarea {
+    font: inherit;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-gold);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  h1, h2, h3, h4 { @apply text-navy; }
+}
+
+@layer components {
+  .container-page { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold
+      transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer select-none;
+  }
+  .btn-sm { @apply px-3 py-1.5 text-xs; }
+  .btn-lg { @apply px-6 py-3 text-base; }
+  .btn-primary { @apply bg-navy text-white hover:bg-navy-700; }
+  .btn-gold { @apply bg-gold text-navy hover:bg-gold-600; }
+  .btn-outline { @apply border border-line bg-white text-navy hover:border-navy/40 hover:bg-cream; }
+  .btn-ghost { @apply text-navy hover:bg-navy/5; }
+  .btn-danger { @apply bg-red-700 text-white hover:bg-red-800; }
+  .btn-danger-outline { @apply border border-red-200 bg-white text-red-700 hover:bg-red-50; }
+
+  .card { @apply rounded-2xl border border-line bg-surface shadow-card; }
+  .card-hover { @apply transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-lift; }
+
+  .input {
+    @apply w-full rounded-md border border-line bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70
+      transition-colors focus:border-gold-600 focus:outline-none focus:ring-2 focus:ring-gold/20;
+  }
+  .input-error { @apply border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/15; }
+  .label { @apply mb-1.5 block text-sm font-medium text-ink; }
+
+  .badge { @apply inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium; }
+
+  .section-title { @apply font-serif text-2xl font-semibold text-navy sm:text-3xl; }
+  .eyebrow { @apply text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-600; }
+
+  .skeleton {
+    @apply rounded-sm;
+    background: linear-gradient(90deg, #e8e7e2 0px, #f4f3ef 120px, #e8e7e2 240px);
+    background-size: 800px 100%;
+    animation: var(--animate-shimmer);
+  }
+
+  .hero-pattern {
+    background:
+      radial-gradient(circle at 84% 18%, rgb(72 195 184 / 0.28), transparent 28%),
+      radial-gradient(circle at 8% 94%, rgb(227 170 101 / 0.2), transparent 30%),
+      linear-gradient(120deg, #132b45 0%, #1d4160 54%, #285d70 100%);
+  }
+  .grid-lines { display: none; }
+
+  .site-header { box-shadow: 0 1px 0 rgb(20 40 61 / 0.04); }
+  .site-footer { background: #102338; }
+
+  .dashboard-sidebar {
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
