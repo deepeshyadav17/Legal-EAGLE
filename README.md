@@ -132,4 +132,4 @@ Before deploying to production:
 1. Supply a strong 32+ byte random `JWT_ACCESS_SECRET` and set `COOKIE_SECURE=true`.
 2. Configure production PostgreSQL TLS (`sslmode=verify-full`).
 3. Supply live Razorpay credentials (`PAYMENT_PROVIDER=RAZORPAY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`).
-4. Configure S3/GCS pre-signed upload credentials for profile photos, firm logos, and profile media posts.
+4. Configure S3/GCS pre-signed upload credentials for profile photos, firm logos, and profile media posts..
