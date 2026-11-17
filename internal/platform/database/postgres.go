@@ -44,6 +44,9 @@ type Store struct {
 	Outbox               []*sqlcgen.OutboxEvent
 	IdempotencyKeys      map[string]*sqlcgen.IdempotencyRecord
 	AuditLogs            []*sqlcgen.AuditLog
+	AdvocateVerifications map[string]*AdvocateVerification
+	DirectConversations   map[string]*DirectConversation
+	DirectMessages        map[string][]*DirectMessage
 }
 
 // NewStore initializes a Store and attempts to connect to PostgreSQL via pgxpool.
@@ -63,6 +66,9 @@ func NewStore(ctx context.Context, cfg *config.Config, log *slog.Logger) (*Store
 		Payments:             make(map[string]*sqlcgen.Payment),
 		Refunds:              make(map[string]*sqlcgen.Refund),
 		IdempotencyKeys:      make(map[string]*sqlcgen.IdempotencyRecord),
+		AdvocateVerifications: make(map[string]*AdvocateVerification),
+		DirectConversations:   make(map[string]*DirectConversation),
+		DirectMessages:        make(map[string][]*DirectMessage),
 	}
 
 	if cfg.DatabaseURL != "" {

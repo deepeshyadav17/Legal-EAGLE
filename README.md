@@ -102,6 +102,15 @@ npm run dev
 - Set `VITE_DEMO_MODE=false` in `.env` to use the live Go backend via `src/services/backendAdapter.js`, or leave `VITE_DEMO_MODE=true` for instant browser-seeded mode.
 - In Demo Mode, lawyers and law firms can add captioned photo and video posts from their profile editor. Posts are stored in the current browser and appear on that profile's public page.
 
+## Advocate Verification & Private Messages
+
+- Lawyers submit their State Bar Council and enrollment number from **Advocate Messages**. A platform administrator must independently review those details and approve the request before messaging is enabled.
+- Approved advocates can start private one-to-one conversations with other approved advocates. Messages are plain text, limited to 4,000 characters, and refreshed in the open conversation every four seconds. Group chat, voice/video calls, and attachments are not included.
+- Admin reviewers use **Advocate verification reviews**. The seeded demo admin is `admin@demo.legaleagle.in` with the demo password shown below.
+- Demo Mode stores verification requests and messages in that browser's local storage; it is for preview only and does not provide shared multi-user messaging.
+- For shared messaging, configure PostgreSQL and the Go API, set `VITE_DEMO_MODE=false` in `.env`, and run both the backend and frontend. The backend migration adds the verification and conversation tables.
+- Main endpoints: `GET/POST /api/v1/advocates/verification/me`, `GET /api/v1/admin/advocate-verifications`, `PATCH /api/v1/admin/advocate-verifications/{profileId}`, and `/api/v1/community/*`.
+
 ---
 
 ## 4. Seeded Demo Accounts

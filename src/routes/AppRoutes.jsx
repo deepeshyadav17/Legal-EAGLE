@@ -34,6 +34,8 @@ import LawyerAppointments from '../pages/lawyer/LawyerAppointments';
 import LawyerAppointmentDetail from '../pages/lawyer/LawyerAppointmentDetail';
 import LawyerFirmMembership from '../pages/lawyer/LawyerFirmMembership';
 import LawyerSettings from '../pages/lawyer/LawyerSettings';
+import AdvocateMessagesPage from '../pages/lawyer/AdvocateMessagesPage';
+import AdminAdvocateVerificationsPage from '../pages/admin/AdminAdvocateVerificationsPage';
 
 import FirmDashboard from '../pages/firm/FirmDashboard';
 import FirmEditProfile from '../pages/firm/FirmEditProfile';
@@ -56,6 +58,9 @@ export default function AppRoutes() {
         <Route path="about" element={<AboutPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="signup" element={<SignupPage />} />
+        <Route element={<ProtectedRoute roles={['admin']} />}>
+          <Route path="admin/advocate-verifications" element={<AdminAdvocateVerificationsPage />} />
+        </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
 
@@ -89,6 +94,7 @@ export default function AppRoutes() {
           <Route path="appointments/:bookingId" element={<LawyerAppointmentDetail />} />
           <Route path="firm-membership" element={<LawyerFirmMembership />} />
           <Route path="settings" element={<LawyerSettings />} />
+          <Route path="messages" element={<AdvocateMessagesPage />} />
         </Route>
       </Route>
 

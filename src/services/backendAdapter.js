@@ -171,5 +171,43 @@ export const goBackendAdapter = {
     const { data } = await apiClient.patch('/notifications/read-all');
     return data;
   },
+
+  // Advocate verification & private community messages
+  async getMyAdvocateVerification() {
+    const { data } = await apiClient.get('/advocates/verification/me');
+    return data;
+  },
+  async submitAdvocateVerification(payload) {
+    const { data } = await apiClient.post('/advocates/verification/me', payload);
+    return data;
+  },
+  async listPendingAdvocateVerifications() {
+    const { data } = await apiClient.get('/admin/advocate-verifications');
+    return data;
+  },
+  async reviewAdvocateVerification(profileId, status) {
+    const { data } = await apiClient.patch(`/admin/advocate-verifications/${profileId}`, { status });
+    return data;
+  },
+  async listVerifiedAdvocates(params) {
+    const { data } = await apiClient.get('/community/advocates', { params });
+    return data;
+  },
+  async listCommunityConversations() {
+    const { data } = await apiClient.get('/community/conversations');
+    return data;
+  },
+  async startCommunityConversation(recipientProfileId) {
+    const { data } = await apiClient.post('/community/conversations', { recipientProfileId });
+    return data;
+  },
+  async listCommunityMessages(conversationId) {
+    const { data } = await apiClient.get(`/community/conversations/${conversationId}/messages`);
+    return data;
+  },
+  async sendCommunityMessage(conversationId, body) {
+    const { data } = await apiClient.post(`/community/conversations/${conversationId}/messages`, { body });
+    return data;
+  },
 };
 

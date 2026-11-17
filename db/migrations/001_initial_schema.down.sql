@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS direct_messages CASCADE;
+DROP TABLE IF EXISTS direct_conversations CASCADE;
+DROP TABLE IF EXISTS advocate_verifications CASCADE;
 DROP TABLE IF EXISTS audit_logs CASCADE;
 DROP TABLE IF EXISTS idempotency_keys CASCADE;
 DROP TABLE IF EXISTS outbox_events CASCADE;

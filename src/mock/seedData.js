@@ -259,6 +259,7 @@ const users = [
   { id: 'u2', role: 'lawyer', name: 'Aarav Sharma', email: 'lawyer@demo.legaleagle.in', profileId: 'l1' },
   { id: 'u3', role: 'firm', name: 'Mehra & Associates', email: 'firm@demo.legaleagle.in', profileId: 'f1', representative: 'Kavya Mehra' },
   { id: 'u4', role: 'lawyer', name: 'Manav Gupta', email: 'lawyer2@demo.legaleagle.in', profileId: 'l15' },
+  { id: 'u5', role: 'admin', name: 'Platform Admin', email: 'admin@demo.legaleagle.in', profileId: 'admin1' },
 ];
 
 export const DEMO_ACCOUNTS = users.map(({ role, name, email }) => ({ role, name, email }));

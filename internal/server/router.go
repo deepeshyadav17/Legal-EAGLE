@@ -15,6 +15,7 @@ import (
 	"github.com/legaleagle/backend/internal/modules/admin"
 	"github.com/legaleagle/backend/internal/modules/availability"
 	"github.com/legaleagle/backend/internal/modules/bookings"
+	"github.com/legaleagle/backend/internal/modules/community"
 	"github.com/legaleagle/backend/internal/modules/discovery"
 	"github.com/legaleagle/backend/internal/modules/firms"
 	"github.com/legaleagle/backend/internal/modules/identity"
@@ -66,6 +67,7 @@ func NewRouter(cfg *config.Config, store *database.Store) *AppBundle {
 	paymentsH := payments.NewHandler(paymentSvc, store, bookingSvc)
 	notifH := notifications.NewHandler(store)
 	adminH := admin.NewHandler(store)
+	communityH := community.NewHandler(store)
 
 	// Health & Readiness Endpoints
 	r.GET("/health/live", func(c *gin.Context) {
@@ -107,6 +109,15 @@ func NewRouter(cfg *config.Config, store *database.Store) *AppBundle {
 		v1.PATCH("/lawyers/:id", middleware.AuthRequired(tm), middleware.RequireRoles("LAWYER"), profilesH.UpdateLawyerMe)
 		v1.POST("/lawyers/:id/:section", middleware.AuthRequired(tm), middleware.RequireRoles("LAWYER"), profilesH.AddPortfolioRecord)
 		v1.DELETE("/lawyers/:id/:section/:recordId", middleware.AuthRequired(tm), middleware.RequireRoles("LAWYER"), profilesH.DeletePortfolioRecord)
+
+		// 2a. Advocate Verification & Private Community Messages
+		v1.GET("/advocates/verification/me", middleware.AuthRequired(tm), middleware.RequireRoles("LAWYER"), communityH.MyVerification)
+		v1.POST("/advocates/verification/me", mutationLimiter, middleware.AuthRequired(tm), middleware.RequireRoles("LAWYER"), communityH.SubmitVerification)
+		v1.GET("/community/advocates", middleware.AuthRequired(tm), middleware.RequireRoles("LAWYER"), communityH.ListVerifiedAdvocates)
+		v1.GET("/community/conversations", middleware.AuthRequired(tm), middleware.RequireRoles("LAWYER"), communityH.ListConversations)
+		v1.POST("/community/conversations", mutationLimiter, middleware.AuthRequired(tm), middleware.RequireRoles("LAWYER"), communityH.StartConversation)
+		v1.GET("/community/conversations/:conversationId/messages", middleware.AuthRequired(tm), middleware.RequireRoles("LAWYER"), communityH.ListMessages)
+		v1.POST("/community/conversations/:conversationId/messages", mutationLimiter, middleware.AuthRequired(tm), middleware.RequireRoles("LAWYER"), communityH.SendMessage)
 
 		// Client Profile & Saved
 		v1.GET("/clients/me", middleware.AuthRequired(tm), middleware.RequireRoles("CLIENT"), profilesH.GetClientMe)
@@ -155,6 +166,8 @@ func NewRouter(cfg *config.Config, store *database.Store) *AppBundle {
 		// 8. Admin & Audit Logging
 		v1.GET("/admin/audit-logs", middleware.AuthRequired(tm), middleware.RequireRoles("PLATFORM_ADMIN"), adminH.ListAuditLogs)
 		v1.GET("/admin/outbox", middleware.AuthRequired(tm), middleware.RequireRoles("PLATFORM_ADMIN"), adminH.ListOutboxEvents)
+		v1.GET("/admin/advocate-verifications", middleware.AuthRequired(tm), middleware.RequireRoles("PLATFORM_ADMIN"), communityH.ListPendingVerifications)
+		v1.PATCH("/admin/advocate-verifications/:profileId", mutationLimiter, middleware.AuthRequired(tm), middleware.RequireRoles("PLATFORM_ADMIN"), communityH.ReviewVerification)
 
 		// API Root Index
 		v1.GET("", func(c *gin.Context) {

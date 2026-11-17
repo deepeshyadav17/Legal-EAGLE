@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Menu, X, ChevronDown, LayoutDashboard, LogOut, Settings, UserRound, Bell, CheckCheck,
+  Menu, X, ChevronDown, LayoutDashboard, LogOut, Settings, UserRound, Bell, CheckCheck, ShieldCheck,
 } from 'lucide-react';
 import Logo from '../common/Logo';
 import Avatar from '../common/Avatar';
@@ -109,7 +109,7 @@ export default function Navbar() {
 
               {/* Notification Center Bell */}
               <div className="relative" ref={notifRef}>
-                <button
+                {user.role !== 'admin' && <button
                   type="button"
                   onClick={() => setNotifOpen((o) => !o)}
                   aria-label={`Notifications (${unreadCount} unread)`}
@@ -122,7 +122,7 @@ export default function Navbar() {
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
-                </button>
+                </button>}
 
                 {notifOpen && (
                   <div className="absolute right-0 mt-2 w-80 overflow-hidden rounded-2xl border border-line bg-white shadow-lift animate-fade-up sm:w-96">
@@ -202,17 +202,22 @@ export default function Navbar() {
                         <UserRound className="h-4 w-4" aria-hidden="true" /> View public profile
                       </Link>
                     )}
-                    <Link role="menuitem" to="/notifications" className="flex items-center justify-between px-4 py-2.5 text-sm hover:bg-cream">
+                    {user.role === 'admin' && (
+                      <Link role="menuitem" to="/admin/advocate-verifications" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-cream">
+                        <ShieldCheck className="h-4 w-4" aria-hidden="true" /> Advocate verification reviews
+                      </Link>
+                    )}
+                    {user.role !== 'admin' && <Link role="menuitem" to="/notifications" className="flex items-center justify-between px-4 py-2.5 text-sm hover:bg-cream">
                       <span className="flex items-center gap-2">
                         <Bell className="h-4 w-4" aria-hidden="true" /> Notifications
                       </span>
                       {unreadCount > 0 && (
                         <span className="badge bg-gold text-navy">{unreadCount}</span>
                       )}
-                    </Link>
-                    <Link role="menuitem" to={settingsPath} className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-cream">
+                    </Link>}
+                    {user.role !== 'admin' && <Link role="menuitem" to={settingsPath} className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-cream">
                       <Settings className="h-4 w-4" aria-hidden="true" /> Settings
-                    </Link>
+                    </Link>}
                     <button role="menuitem" type="button" onClick={handleLogout} className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-red-700 hover:bg-red-50">
                       <LogOut className="h-4 w-4" aria-hidden="true" /> Log out
                     </button>
@@ -252,9 +257,15 @@ export default function Navbar() {
             {user ? (
               <>
                 <li><Link to={dashboardPath(user.role)} className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-cream">Dashboard</Link></li>
-                <li><Link to="/notifications" className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-cream">Notifications ({unreadCount})</Link></li>
+                {user.role === 'admin' ? (
+                  <li><Link to="/admin/advocate-verifications" className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-cream">Advocate verification reviews</Link></li>
+                ) : (
+                  <>
+                    <li><Link to="/notifications" className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-cream">Notifications ({unreadCount})</Link></li>
+                    <li><Link to={settingsPath} className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-cream">Settings</Link></li>
+                  </>
+                )}
                 {profilePath && <li><Link to={profilePath} className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-cream">View public profile</Link></li>}
-                <li><Link to={settingsPath} className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-cream">Settings</Link></li>
                 <li><button type="button" onClick={handleLogout} className="w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium text-red-700 hover:bg-red-50">Log out</button></li>
               </>
             ) : (

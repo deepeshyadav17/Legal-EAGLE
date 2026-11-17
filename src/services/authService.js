@@ -1,5 +1,5 @@
 import { getDb, commit, delay, clone, uid, ServiceError } from './mockDb';
-import { apiClient, setAccessToken } from './apiClient';
+import { apiClient, DEMO_MODE, setAccessToken } from './apiClient';
 import {
   containsInjection,
   createSignedSession,
@@ -155,6 +155,9 @@ export async function login(rawEmail, rawPassword) {
     }
   } catch (err) {
     if (err.status === 429) throw new ServiceError(err.message, 429);
+    if (!DEMO_MODE) {
+      throw new ServiceError(err.message || 'Unable to authenticate with the live service.', err.status || 503);
+    }
     if (!user && err.status === 401) {
       throw new ServiceError('Invalid email or password.', 401);
     }
@@ -169,11 +172,14 @@ export async function login(rawEmail, rawPassword) {
 }
 
 export async function demoLogin(rawRole) {
+  if (!DEMO_MODE) {
+    throw new ServiceError('Demo sign-in is disabled when the live backend is enabled.', 403);
+  }
   const role = sanitizeString(String(rawRole ?? ''), { maxLength: 32 }).toLowerCase();
   enforceRateLimit('auth', `demo:${role}`);
   await delay(200);
 
-  if (!['client', 'lawyer', 'firm'].includes(role)) {
+  if (!['client', 'lawyer', 'firm', 'admin'].includes(role)) {
     throw new ServiceError('Invalid demo role requested.', 400);
   }
 

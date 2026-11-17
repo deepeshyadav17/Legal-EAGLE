@@ -58,9 +58,14 @@ export function gradientFor(seed = '') {
   return `linear-gradient(135deg, ${a}, ${b})`;
 }
 
-export const dashboardPath = (role) => ({ client: '/client/dashboard', lawyer: '/lawyer/dashboard', firm: '/firm/dashboard' })[role] || '/';
+export const dashboardPath = (role) => ({
+  client: '/client/dashboard',
+  lawyer: '/lawyer/dashboard',
+  firm: '/firm/dashboard',
+  admin: '/admin/advocate-verifications',
+})[role] || '/';
 
-export const ROLE_LABEL = { client: 'Client', lawyer: 'Lawyer', firm: 'Law Firm' };
+export const ROLE_LABEL = { client: 'Client', lawyer: 'Lawyer', firm: 'Law Firm', admin: 'Platform Admin' };
 
 /** Formats an amount in INR (e.g. 1500 -> "₹1,500") */
 export function formatINR(amount = 0) {

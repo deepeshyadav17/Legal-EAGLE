@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { UserRound, Scale, Building2, Loader2, ArrowRight } from 'lucide-react';
+import { UserRound, Scale, Building2, ShieldCheck, Loader2, ArrowRight } from 'lucide-react';
 import FormField from '../../components/forms/FormField';
 import DemoBadge from '../../components/common/DemoBadge';
 import { useAuth } from '../../context/AuthContext';
@@ -10,6 +10,7 @@ import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { rules } from '../../utils/validators';
 import { dashboardPath, ROLE_LABEL } from '../../utils/format';
 import { DEMO_ACCOUNTS } from '../../mock/seedData';
+import { DEMO_MODE } from '../../services/apiClient';
 
 const ROLE_CARDS = [
   {
@@ -32,6 +33,13 @@ const ROLE_CARDS = [
     title: 'Demo Law Firm',
     subtitle: 'Mehra & Associates · Manage team & invitations',
     email: 'firm@demo.legaleagle.in',
+  },
+  {
+    role: 'admin',
+    icon: ShieldCheck,
+    title: 'Demo Platform Admin',
+    subtitle: 'Review advocate verification applications',
+    email: 'admin@demo.legaleagle.in',
   },
 ];
 
@@ -92,7 +100,7 @@ export default function LoginPage() {
     <div className="container-page py-12 sm:py-16">
       <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
         {/* One-Click Demo Role Switcher */}
-        <section className="card p-6 sm:p-8 lg:col-span-7" aria-labelledby="demo-login-heading">
+        {DEMO_MODE && <section className="card p-6 sm:p-8 lg:col-span-7" aria-labelledby="demo-login-heading">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <DemoBadge />
             <span className="text-xs text-muted">Instant role switching</span>
@@ -157,15 +165,15 @@ export default function LoginPage() {
               ))}
             </ul>
           </div>
-        </section>
+        </section>}
 
         {/* Standard Email & Password Login Form */}
-        <section className="card p-6 sm:p-8 lg:col-span-5" aria-labelledby="login-form-heading">
+        <section className={`card p-6 sm:p-8 ${DEMO_MODE ? 'lg:col-span-5' : 'lg:col-span-12'}`} aria-labelledby="login-form-heading">
           <h2 id="login-form-heading" className="font-serif text-xl font-semibold text-navy sm:text-2xl">
             Sign In with Email
           </h2>
           <p className="mt-1 text-xs text-muted">
-            Enter a demo account email or an email you registered in this browser.
+            {DEMO_MODE ? 'Enter a demo account email or an email you registered in this browser.' : 'Enter your registered account credentials.'}
           </p>
 
           <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
@@ -195,7 +203,7 @@ export default function LoginPage() {
           <p className="mt-6 border-t border-line pt-4 text-center text-sm text-muted">
             New to Legal Eagle?{' '}
             <Link to="/signup" className="font-semibold text-navy hover:underline">
-              Create a demo account
+              {DEMO_MODE ? 'Create a demo account' : 'Create an account'}
             </Link>
           </p>
         </section>

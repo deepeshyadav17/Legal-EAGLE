@@ -14,6 +14,11 @@ export function getDb() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       db = raw ? JSON.parse(raw) : structuredClone(seed);
+      if (!Array.isArray(db.users)) db.users = [];
+      const demoAdmin = seed.users.find((user) => user.role === 'admin');
+      if (demoAdmin && !db.users.some((user) => user.email === demoAdmin.email)) {
+        db.users.push(clone(demoAdmin));
+      }
     } catch {
       db = structuredClone(seed);
     }

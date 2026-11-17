@@ -407,3 +407,43 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 
 CREATE INDEX IF NOT EXISTS idx_audit_logs_resource ON audit_logs (resource_type, resource_id, created_at DESC);
 
+-- ----------------------------------------------------------------------------
+-- 15. Advocate verification and private advocate-to-advocate messaging
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS advocate_verifications (
+    lawyer_profile_id VARCHAR(64) PRIMARY KEY REFERENCES lawyer_profiles(external_id) ON DELETE CASCADE,
+    bar_council       VARCHAR(120) NOT NULL,
+    enrollment_number VARCHAR(80) NOT NULL,
+    status            VARCHAR(16) NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED')),
+    submitted_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    reviewed_at       TIMESTAMPTZ,
+    reviewed_by       VARCHAR(64) REFERENCES users(external_id) ON DELETE SET NULL,
+    CHECK ((status = 'PENDING' AND reviewed_at IS NULL) OR (status <> 'PENDING' AND reviewed_at IS NOT NULL))
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_advocate_verification_enrollment
+    ON advocate_verifications (LOWER(bar_council), LOWER(enrollment_number));
+CREATE INDEX IF NOT EXISTS idx_advocate_verification_status
+    ON advocate_verifications (status, submitted_at);
+
+CREATE TABLE IF NOT EXISTS direct_conversations (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    participant_a   VARCHAR(64) NOT NULL REFERENCES lawyer_profiles(external_id) ON DELETE CASCADE,
+    participant_b   VARCHAR(64) NOT NULL REFERENCES lawyer_profiles(external_id) ON DELETE CASCADE,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CHECK (participant_a < participant_b),
+    UNIQUE (participant_a, participant_b)
+);
+
+CREATE TABLE IF NOT EXISTS direct_messages (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    conversation_id     UUID NOT NULL REFERENCES direct_conversations(id) ON DELETE CASCADE,
+    sender_profile_id   VARCHAR(64) NOT NULL REFERENCES lawyer_profiles(external_id) ON DELETE CASCADE,
+    body                VARCHAR(4000) NOT NULL CHECK (char_length(btrim(body)) BETWEEN 1 AND 4000),
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_direct_messages_conversation_created
+    ON direct_messages (conversation_id, created_at, id);
+

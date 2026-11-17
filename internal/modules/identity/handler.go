@@ -299,6 +299,10 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 
 	email := shared.SanitizeEmail(req.Email)
+	if strings.EqualFold(h.cfg.AppEnv, "production") && strings.HasSuffix(email, "@demo.legaleagle.in") {
+		shared.RespondError(c, shared.NewUnauthorized("Demo accounts cannot sign in to the production service."))
+		return
+	}
 	var found *sqlcgen.User
 	for _, u := range h.store.Users {
 		if strings.EqualFold(u.Email, email) {
@@ -407,6 +411,10 @@ func (h *Handler) Login(c *gin.Context) {
 // @Success 200 {object} map[string]any
 // @Router /auth/demo-login [post]
 func (h *Handler) DemoLogin(c *gin.Context) {
+	if strings.EqualFold(h.cfg.AppEnv, "production") {
+		shared.RespondError(c, shared.NewForbidden("Demo sign-in is disabled in production."))
+		return
+	}
 	var req DemoLoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		shared.RespondError(c, shared.NewBadRequest("Role is required."))

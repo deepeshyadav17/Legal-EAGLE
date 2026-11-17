@@ -433,9 +433,10 @@ func syncToPostgres(s *database.Store) {
 			office = cs.OfficeLocation
 		}
 		_, _ = s.Pool.Exec(ctx, `
-			INSERT INTO lawyer_profiles (id, external_id, name, headline, city, experience_years, about, photo_url, languages, contact_email, contact_phone, contact_visibility, consultation_fee, currency, available_modes, booking_lead_hours, office_location, is_active)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, TRUE)
-			ON CONFLICT (external_id) DO NOTHING
+			INSERT INTO lawyer_profiles (id, external_id, user_id, name, headline, city, experience_years, about, photo_url, languages, contact_email, contact_phone, contact_visibility, consultation_fee, currency, available_modes, booking_lead_hours, office_location, is_active)
+			VALUES ($1, $2, (SELECT id FROM users WHERE profile_id = $2 AND role = 'LAWYER' LIMIT 1), $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, TRUE)
+			ON CONFLICT (external_id) DO UPDATE
+			SET user_id = COALESCE(lawyer_profiles.user_id, EXCLUDED.user_id)
 		`, lp.UUID, lp.ID, lp.Name, lp.Headline, lp.City, lp.ExperienceYears, lp.About, lp.Photo, lp.Languages, lp.Contact.Email, lp.Contact.Phone, lp.ContactVisibility, fee, currency, modes, lead, office)
 	}
 

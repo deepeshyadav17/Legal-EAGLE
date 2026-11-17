@@ -2,6 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Bookmark, Settings, UserPen, Building2, Users, Inbox, ExternalLink,
   CalendarCheck, Clock, RefreshCw, CreditCard, RotateCcw, Bell, CalendarClock, Sliders, History, CalendarDays,
+  MessageCircle,
 } from 'lucide-react';
 import Avatar from '../common/Avatar';
 import DemoBadge from '../common/DemoBadge';
@@ -22,6 +23,7 @@ export const NAV_BY_ROLE = {
   ],
   lawyer: [
     { to: '/lawyer/dashboard', label: 'Overview', icon: LayoutDashboard },
+    { to: '/lawyer/messages', label: 'Advocate Messages', icon: MessageCircle },
     { to: '/lawyer/consultation-requests', label: 'Consultation Requests', icon: Inbox },
     { to: '/lawyer/appointments', label: 'Upcoming Appointments', icon: CalendarCheck, exactQuery: '' },
     { to: '/lawyer/availability', label: 'Manage Availability', icon: CalendarClock },
