@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as authService from '../services/authService';
+import { DEMO_MODE } from '../services/apiClient';
 
 /**
  * Demo session context. Role values here drive UI only — they are not
@@ -9,6 +10,23 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => authService.getSessionUser());
+  const [isReady, setIsReady] = useState(DEMO_MODE);
+
+  useEffect(() => {
+    if (DEMO_MODE) return;
+    let active = true;
+    authService.refreshSession()
+      .then((restoredUser) => {
+        if (active) setUser(restoredUser);
+      })
+      .catch(() => {
+        if (active) setUser(null);
+      })
+      .finally(() => {
+        if (active) setIsReady(true);
+      });
+    return () => { active = false; };
+  }, []);
 
   const login = useCallback(async (email, password) => {
     const u = await authService.login(email, password);
@@ -42,8 +60,8 @@ export function AuthProvider({ children }) {
   const refreshUser = useCallback(() => setUser(authService.getSessionUser()), []);
 
   const value = useMemo(
-    () => ({ user, isAuthenticated: !!user, login, demoLogin, register, logout, updateAccount, refreshUser }),
-    [user, login, demoLogin, register, logout, updateAccount, refreshUser],
+    () => ({ user, isAuthenticated: !!user, isReady, login, demoLogin, register, logout, updateAccount, refreshUser }),
+    [user, isReady, login, demoLogin, register, logout, updateAccount, refreshUser],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

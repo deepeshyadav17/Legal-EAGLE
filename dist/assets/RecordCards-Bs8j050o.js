@@ -1,0 +1,16 @@
+import{c as i,j as e,au as x,Z as u}from"./index-CH7Gadis.js";import{B as p}from"./practiceIcons-BlF26Sbc.js";import{B as h}from"./badge-check-Dx1055h8.js";import{T as f}from"./trash-2-BSYV8qh5.js";/**
+ * @license lucide-react v0.468.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const m=i("Award",[["path",{d:"m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526",key:"1yiouv"}],["circle",{cx:"12",cy:"8",r:"6",key:"1vp47v"}]]);/**
+ * @license lucide-react v0.468.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const j=i("GraduationCap",[["path",{d:"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z",key:"j76jl0"}],["path",{d:"M22 10v6",key:"1lu8f3"}],["path",{d:"M6 12.5V16a6 3 0 0 0 12 0v-3.5",key:"1r8lef"}]]);/**
+ * @license lucide-react v0.468.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const b=i("Pencil",[["path",{d:"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z",key:"1a8usu"}],["path",{d:"m15 5 4 4",key:"1mk7zo"}]]);function s({icon:a,title:t,subtitle:l,meta:c,children:d,onEdit:r,onDelete:n,label:o}){return e.jsxs("li",{className:"group flex gap-4 py-4 first:pt-0 last:pb-0",children:[e.jsx("span",{className:"grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-line bg-cream text-navy",children:e.jsx(a,{className:"h-5 w-5","aria-hidden":"true"})}),e.jsxs("div",{className:"min-w-0 flex-1",children:[e.jsx("h4",{className:"font-semibold text-navy",children:t}),l&&e.jsx("p",{className:"text-sm text-ink",children:l}),c&&e.jsx("p",{className:"mt-0.5 text-xs text-muted",children:c}),d&&e.jsx("p",{className:"mt-2 text-sm leading-relaxed text-ink/90",children:d})]}),(r||n)&&e.jsxs("div",{className:"flex shrink-0 items-start gap-1",children:[r&&e.jsx("button",{type:"button",onClick:r,className:"btn-ghost rounded-lg p-2","aria-label":`Edit ${o}`,children:e.jsx(b,{className:"h-4 w-4"})}),n&&e.jsx("button",{type:"button",onClick:n,className:"rounded-lg p-2 text-red-700 hover:bg-red-50","aria-label":`Delete ${o}`,children:e.jsx(f,{className:"h-4 w-4"})})]})]})}function $({item:a,...t}){return e.jsx(s,{icon:j,title:a.institution,subtitle:`${a.degree}${a.field?`, ${a.field}`:""}`,meta:`${a.startYear} – ${a.endYear||"Present"}`,label:`${a.degree} at ${a.institution}`,...t})}function v({item:a,...t}){return e.jsx(s,{icon:p,title:a.designation,subtitle:a.organization,meta:x(a.startDate,a.endDate),label:`${a.designation} at ${a.organization}`,...t,children:a.description})}function C({item:a,...t}){return e.jsx(s,{icon:h,title:a.title,subtitle:a.issuer,meta:`Issued ${u(a.issueDate)}`,label:a.title,...t})}function w({item:a,...t}){return e.jsx(s,{icon:m,title:a.title,meta:u(a.date),label:a.title,...t,children:a.description})}export{m as A,v as E,j as G,C as Q,$ as a,w as b};

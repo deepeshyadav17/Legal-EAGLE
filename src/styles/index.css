@@ -65,7 +65,7 @@
   .btn-danger { @apply bg-red-700 text-white hover:bg-red-800; }
   .btn-danger-outline { @apply border border-red-200 bg-white text-red-700 hover:bg-red-50; }
 
-  .card { @apply rounded-2xl border border-line bg-surface shadow-card; }
+  .card { @apply rounded-xl border border-line bg-surface shadow-card; }
   .card-hover { @apply transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-lift; }
 
   .input {
@@ -87,12 +87,7 @@
     animation: var(--animate-shimmer);
   }
 
-  .hero-pattern {
-    background:
-      radial-gradient(circle at 84% 18%, rgb(72 195 184 / 0.28), transparent 28%),
-      radial-gradient(circle at 8% 94%, rgb(227 170 101 / 0.2), transparent 30%),
-      linear-gradient(120deg, #132b45 0%, #1d4160 54%, #285d70 100%);
-  }
+  .hero-pattern { background: #17314d; }
   .grid-lines { display: none; }
 
   .site-header { box-shadow: 0 1px 0 rgb(20 40 61 / 0.04); }

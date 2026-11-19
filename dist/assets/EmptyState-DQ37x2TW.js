@@ -1,0 +1,11 @@
+import{c as d,j as e,R as m}from"./index-CH7Gadis.js";/**
+ * @license lucide-react v0.468.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const r=d("OctagonAlert",[["path",{d:"M12 16h.01",key:"1drbdi"}],["path",{d:"M12 8v4",key:"1got3b"}],["path",{d:"M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z",key:"1fd625"}]]);/**
+ * @license lucide-react v0.468.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const i=d("SearchX",[["path",{d:"m13.5 8.5-5 5",key:"1cs55j"}],["path",{d:"m8.5 8.5 5 5",key:"a8mexj"}],["circle",{cx:"11",cy:"11",r:"8",key:"4ej97u"}],["path",{d:"m21 21-4.3-4.3",key:"1qie3q"}]]);function h({icon:t=i,title:a,message:s,description:n,action:c}){const l=s||n;return e.jsxs("div",{className:"card flex flex-col items-center px-6 py-14 text-center animate-fade-up",children:[e.jsx("span",{className:"mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-gold-100 text-gold-600",children:e.jsx(t,{className:"h-7 w-7","aria-hidden":"true"})}),e.jsx("h3",{className:"text-lg font-semibold",children:a}),l&&e.jsx("p",{className:"mt-1.5 max-w-md text-sm text-muted",children:l}),c&&e.jsx("div",{className:"mt-5",children:c})]})}function o({error:t,onRetry:a,title:s="Something went wrong"}){return e.jsxs("div",{role:"alert",className:"card flex flex-col items-center border-red-100 px-6 py-14 text-center",children:[e.jsx("span",{className:"mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-red-50 text-red-700",children:e.jsx(r,{className:"h-7 w-7","aria-hidden":"true"})}),e.jsx("h3",{className:"text-lg font-semibold",children:s}),e.jsx("p",{className:"mt-1.5 max-w-md text-sm text-muted",children:(t==null?void 0:t.message)||"Please try again."}),a&&e.jsxs("button",{type:"button",onClick:()=>a(),className:"btn btn-outline mt-5",children:[e.jsx(m,{className:"h-4 w-4","aria-hidden":"true"})," Try again"]})]})}export{o as E,h as a};

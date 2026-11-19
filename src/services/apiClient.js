@@ -44,8 +44,31 @@ apiClient.interceptors.request.use((cfg) => {
 
 apiClient.interceptors.response.use(
   (res) => res,
-  (error) => {
+  async (error) => {
     const status = error.response?.status;
+    const originalRequest = error.config;
+
+    if (
+      status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/login') &&
+      !originalRequest.url?.includes('/auth/register') &&
+      !originalRequest.url?.includes('/auth/refresh') &&
+      !DEMO_MODE
+    ) {
+      originalRequest._retry = true;
+      try {
+        const { data } = await apiClient.post('/auth/refresh');
+        setAccessToken(data.accessToken);
+        originalRequest.headers = originalRequest.headers || {};
+        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+        return apiClient(originalRequest);
+      } catch {
+        setAccessToken(null);
+      }
+    }
+
     if (status === 429) {
       const retryAfter = error.response?.headers?.['retry-after'] || error.response?.data?.retryAfter || 5;
       const msg = error.response?.data?.message || `Too many requests. Please wait ${retryAfter}s and try again.`;

@@ -119,47 +119,44 @@ export async function login(rawEmail, rawPassword) {
     }
   }
 
-  // Authenticate against Go + PostgreSQL backend when reachable
-  try {
-    const loginPayload = user
-      ? {
-          email,
-          password,
-          name: user.name,
-          role: user.role,
-          profileId: user.profileId,
-          representative: user.representative || '',
-        }
-      : { email, password };
-    const res = await apiClient.post('/auth/login', loginPayload);
-    if (res?.data?.accessToken) {
-      setAccessToken(res.data.accessToken);
-    }
-    const backendUser = res?.data?.user;
-    if (backendUser && !user) {
-      const normalizedRole = (backendUser.role || 'client').toLowerCase().replace('firm_admin', 'firm');
-      user = {
-        id: backendUser.id || uid('u'),
-        role: normalizedRole,
-        name: backendUser.name || email.split('@')[0],
-        email: backendUser.email || email,
-        profileId: backendUser.profileId || uid(normalizedRole[0]),
-        passwordHash: hashPasswordSync(password, email),
-        ...(backendUser.representative && { representative: backendUser.representative }),
-      };
-      db.users.push(user);
-      if (normalizedRole === 'client' && !db.clients.some((c) => c.id === user.profileId)) {
-        db.clients.push({ id: user.profileId, name: user.name, email, city: '', saved: { lawyers: [], firms: [] }, recent: [] });
+  // Authenticate against Go + PostgreSQL only in Live Mode.
+  if (!DEMO_MODE) {
+    try {
+      const loginPayload = user
+        ? {
+            email,
+            password,
+            name: user.name,
+            role: user.role,
+            profileId: user.profileId,
+            representative: user.representative || '',
+          }
+        : { email, password };
+      const res = await apiClient.post('/auth/login', loginPayload);
+      if (res?.data?.accessToken) {
+        setAccessToken(res.data.accessToken);
       }
-      commit();
-    }
-  } catch (err) {
-    if (err.status === 429) throw new ServiceError(err.message, 429);
-    if (!DEMO_MODE) {
+      const backendUser = res?.data?.user;
+      if (backendUser && !user) {
+        const normalizedRole = (backendUser.role || 'client').toLowerCase().replace('firm_admin', 'firm');
+        user = {
+          id: backendUser.id || uid('u'),
+          role: normalizedRole,
+          name: backendUser.name || email.split('@')[0],
+          email: backendUser.email || email,
+          profileId: backendUser.profileId || uid(normalizedRole[0]),
+          passwordHash: hashPasswordSync(password, email),
+          ...(backendUser.representative && { representative: backendUser.representative }),
+        };
+        db.users.push(user);
+        if (normalizedRole === 'client' && !db.clients.some((c) => c.id === user.profileId)) {
+          db.clients.push({ id: user.profileId, name: user.name, email, city: '', saved: { lawyers: [], firms: [] }, recent: [] });
+        }
+        commit();
+      }
+    } catch (err) {
+      if (err.status === 429) throw new ServiceError(err.message, 429);
       throw new ServiceError(err.message || 'Unable to authenticate with the live service.', err.status || 503);
-    }
-    if (!user && err.status === 401) {
-      throw new ServiceError('Invalid email or password.', 401);
     }
   }
 
@@ -183,15 +180,6 @@ export async function demoLogin(rawRole) {
     throw new ServiceError('Invalid demo role requested.', 400);
   }
 
-  try {
-    const res = await apiClient.post('/auth/demo-login', { role });
-    if (res?.data?.accessToken) {
-      setAccessToken(res.data.accessToken);
-    }
-  } catch {
-    // Offline fallback continues seamlessly
-  }
-
   const user = getDb().users.find((u) => u.role === role);
   if (!user) throw new ServiceError('Demo account not available.', 404);
   sessionStorage.setItem(SESSION_KEY, createSignedSession(user));
@@ -200,14 +188,53 @@ export async function demoLogin(rawRole) {
 
 export async function logout() {
   await delay(100);
-  try {
-    await apiClient.post('/auth/logout');
-  } catch {
-    // Ignore offline error on logout
+  if (!DEMO_MODE) {
+    try {
+      await apiClient.post('/auth/logout');
+    } catch {
+      // Ignore offline error on logout
+    }
   }
   setAccessToken(null);
   sessionStorage.removeItem(SESSION_KEY);
   sessionStorage.removeItem(LEGACY_SESSION_KEY);
+}
+
+export async function refreshSession() {
+  if (DEMO_MODE) return getSessionUser();
+
+  try {
+    const { data } = await apiClient.post('/auth/refresh');
+    setAccessToken(data.accessToken);
+    const backendUser = data.user;
+    if (!backendUser) return null;
+
+    const normalizedRole = (backendUser.frontendRole || backendUser.role || 'client')
+      .toString()
+      .toLowerCase()
+      .replace('firm_admin', 'firm')
+      .replace('platform_admin', 'admin');
+    const user = {
+      id: backendUser.externalId || backendUser.id || backendUser.profileId,
+      role: normalizedRole,
+      name: backendUser.name || backendUser.email?.split('@')[0] || 'Account',
+      email: backendUser.email,
+      profileId: backendUser.profileId,
+      ...(backendUser.representative && { representative: backendUser.representative }),
+    };
+
+    const db = getDb();
+    const existingIndex = db.users.findIndex((u) => u.email?.toLowerCase() === user.email?.toLowerCase());
+    if (existingIndex >= 0) db.users[existingIndex] = { ...db.users[existingIndex], ...user };
+    else db.users.push(user);
+    commit();
+    sessionStorage.setItem(SESSION_KEY, createSignedSession(user));
+    return publicUser(user);
+  } catch {
+    setAccessToken(null);
+    sessionStorage.removeItem(SESSION_KEY);
+    return null;
+  }
 }
 
 export async function register(rawRole, rawData) {
@@ -326,14 +353,16 @@ export async function register(rawRole, rawData) {
   commit();
   sessionStorage.setItem(SESSION_KEY, createSignedSession(user));
 
-  // Sync registration with Go + PostgreSQL backend (/api/v1/auth/register) when running
-  try {
-    const res = await apiClient.post('/auth/register', { role, ...data, password: rawData.password });
-    if (res?.data?.accessToken) {
-      setAccessToken(res.data.accessToken);
+  // Sync registration with Go + PostgreSQL only in Live Mode.
+  if (!DEMO_MODE) {
+    try {
+      const res = await apiClient.post('/auth/register', { role, ...data, password: rawData.password });
+      if (res?.data?.accessToken) {
+        setAccessToken(res.data.accessToken);
+      }
+    } catch (err) {
+      if (err.status === 429) throw new ServiceError(err.message, 429);
     }
-  } catch (err) {
-    if (err.status === 429) throw new ServiceError(err.message, 429);
   }
 
   return publicUser(user);

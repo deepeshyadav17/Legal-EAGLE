@@ -1,0 +1,6 @@
+import{c as m,al as k,r as x,j as t,ap as f,a as b}from"./index-CH7Gadis.js";/**
+ * @license lucide-react v0.468.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const S=m("BookmarkCheck",[["path",{d:"m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z",key:"169p4p"}],["path",{d:"m9 10 2 2 4-4",key:"1gnqz4"}]]);function y({type:o,id:s,name:a,variant:p="icon",className:r=""}){const{canSave:h,isSaved:v,toggle:g}=k(),[n,d]=x.useState(!1);if(!h)return null;const e=v(o,s),l=async u=>{u.preventDefault(),u.stopPropagation(),d(!0),await g(o,s,a),d(!1)},i=e?S:f,c=e?`Remove ${a} from saved`:`Save ${a}`;return p==="button"?t.jsxs("button",{type:"button",onClick:l,disabled:n,"aria-pressed":e,className:b("btn",e?"btn-gold":"btn-outline",r),children:[t.jsx(i,{className:"h-4 w-4","aria-hidden":"true"})," ",e?"Saved":"Save"]}):t.jsx("button",{type:"button",onClick:l,disabled:n,"aria-pressed":e,"aria-label":c,title:c,className:b("relative z-10 grid h-9 w-9 place-items-center rounded-full border transition",e?"border-gold bg-gold-100 text-gold-600":"border-line bg-white text-muted hover:border-gold hover:text-gold-600",r),children:t.jsx(i,{className:"h-4 w-4","aria-hidden":"true"})})}export{y as S};

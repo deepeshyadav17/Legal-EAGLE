@@ -1,52 +1,62 @@
+import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import PublicLayout from '../components/layout/PublicLayout';
 import RoleBasedLayout from '../components/layout/RoleBasedLayout';
 import ProtectedRoute from './ProtectedRoute';
 
-import HomePage from '../pages/public/HomePage';
-import SearchPage from '../pages/public/SearchPage';
-import LawyerProfilePage from '../pages/public/LawyerProfilePage';
-import FirmProfilePage from '../pages/public/FirmProfilePage';
-import AboutPage from '../pages/public/AboutPage';
-import NotFoundPage from '../pages/public/NotFoundPage';
-import NotificationsPage from '../pages/public/NotificationsPage';
-import CalendarPage from '../pages/public/CalendarPage';
-import LoginPage from '../pages/auth/LoginPage';
-import SignupPage from '../pages/auth/SignupPage';
+const HomePage = lazy(() => import('../pages/public/HomePage'));
+const SearchPage = lazy(() => import('../pages/public/SearchPage'));
+const LawyerProfilePage = lazy(() => import('../pages/public/LawyerProfilePage'));
+const FirmProfilePage = lazy(() => import('../pages/public/FirmProfilePage'));
+const AboutPage = lazy(() => import('../pages/public/AboutPage'));
+const NotFoundPage = lazy(() => import('../pages/public/NotFoundPage'));
+const NotificationsPage = lazy(() => import('../pages/public/NotificationsPage'));
+const CalendarPage = lazy(() => import('../pages/public/CalendarPage'));
+const LoginPage = lazy(() => import('../pages/auth/LoginPage'));
+const SignupPage = lazy(() => import('../pages/auth/SignupPage'));
 
-import BookConsultationPage from '../pages/client/BookConsultationPage';
-import CheckoutPage from '../pages/client/CheckoutPage';
-import PaymentResultPage from '../pages/client/PaymentResultPage';
-import ClientDashboard from '../pages/client/ClientDashboard';
-import ClientConsultations from '../pages/client/ClientConsultations';
-import ClientConsultationDetail from '../pages/client/ClientConsultationDetail';
-import ClientPayments from '../pages/client/ClientPayments';
-import ClientRefunds from '../pages/client/ClientRefunds';
-import ClientSaved from '../pages/client/ClientSaved';
-import ClientSettings from '../pages/client/ClientSettings';
+const BookConsultationPage = lazy(() => import('../pages/client/BookConsultationPage'));
+const CheckoutPage = lazy(() => import('../pages/client/CheckoutPage'));
+const PaymentResultPage = lazy(() => import('../pages/client/PaymentResultPage'));
+const ClientDashboard = lazy(() => import('../pages/client/ClientDashboard'));
+const ClientConsultations = lazy(() => import('../pages/client/ClientConsultations'));
+const ClientConsultationDetail = lazy(() => import('../pages/client/ClientConsultationDetail'));
+const ClientPayments = lazy(() => import('../pages/client/ClientPayments'));
+const ClientRefunds = lazy(() => import('../pages/client/ClientRefunds'));
+const ClientSaved = lazy(() => import('../pages/client/ClientSaved'));
+const ClientSettings = lazy(() => import('../pages/client/ClientSettings'));
 
-import LawyerDashboard from '../pages/lawyer/LawyerDashboard';
-import LawyerEditProfile from '../pages/lawyer/LawyerEditProfile';
-import LawyerAvailability from '../pages/lawyer/LawyerAvailability';
-import LawyerConsultationSettings from '../pages/lawyer/LawyerConsultationSettings';
-import LawyerConsultationRequests from '../pages/lawyer/LawyerConsultationRequests';
-import LawyerAppointments from '../pages/lawyer/LawyerAppointments';
-import LawyerAppointmentDetail from '../pages/lawyer/LawyerAppointmentDetail';
-import LawyerFirmMembership from '../pages/lawyer/LawyerFirmMembership';
-import LawyerSettings from '../pages/lawyer/LawyerSettings';
-import AdvocateMessagesPage from '../pages/lawyer/AdvocateMessagesPage';
-import AdminAdvocateVerificationsPage from '../pages/admin/AdminAdvocateVerificationsPage';
+const LawyerDashboard = lazy(() => import('../pages/lawyer/LawyerDashboard'));
+const LawyerEditProfile = lazy(() => import('../pages/lawyer/LawyerEditProfile'));
+const LawyerAvailability = lazy(() => import('../pages/lawyer/LawyerAvailability'));
+const LawyerConsultationSettings = lazy(() => import('../pages/lawyer/LawyerConsultationSettings'));
+const LawyerConsultationRequests = lazy(() => import('../pages/lawyer/LawyerConsultationRequests'));
+const LawyerAppointments = lazy(() => import('../pages/lawyer/LawyerAppointments'));
+const LawyerAppointmentDetail = lazy(() => import('../pages/lawyer/LawyerAppointmentDetail'));
+const LawyerFirmMembership = lazy(() => import('../pages/lawyer/LawyerFirmMembership'));
+const LawyerSettings = lazy(() => import('../pages/lawyer/LawyerSettings'));
+const AdvocateMessagesPage = lazy(() => import('../pages/lawyer/AdvocateMessagesPage'));
+const AdminAdvocateVerificationsPage = lazy(() => import('../pages/admin/AdminAdvocateVerificationsPage'));
 
-import FirmDashboard from '../pages/firm/FirmDashboard';
-import FirmEditProfile from '../pages/firm/FirmEditProfile';
-import FirmMembers from '../pages/firm/FirmMembers';
-import FirmRequests from '../pages/firm/FirmRequests';
-import FirmConsultations from '../pages/firm/FirmConsultations';
-import FirmSettings from '../pages/firm/FirmSettings';
+const FirmDashboard = lazy(() => import('../pages/firm/FirmDashboard'));
+const FirmEditProfile = lazy(() => import('../pages/firm/FirmEditProfile'));
+const FirmMembers = lazy(() => import('../pages/firm/FirmMembers'));
+const FirmRequests = lazy(() => import('../pages/firm/FirmRequests'));
+const FirmConsultations = lazy(() => import('../pages/firm/FirmConsultations'));
+const FirmSettings = lazy(() => import('../pages/firm/FirmSettings'));
+
+function RouteLoading() {
+  return (
+    <div className="grid min-h-[50vh] place-items-center" role="status" aria-label="Loading page">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-line border-t-navy" />
+    </div>
+  );
+}
 
 export default function AppRoutes() {
   return (
-    <Routes>
+    <Suspense fallback={<RouteLoading />}>
+      <Routes>
       <Route element={<PublicLayout />}>
         <Route index element={<HomePage />} />
         <Route path="search" element={<SearchPage />} />
@@ -108,6 +118,7 @@ export default function AppRoutes() {
           <Route path="settings" element={<FirmSettings />} />
         </Route>
       </Route>
-    </Routes>
+      </Routes>
+    </Suspense>
   );
 }

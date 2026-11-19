@@ -140,9 +140,9 @@ export default function HomePage() {
               <Link
                 key={area.slug}
                 to={`/search?practice=${area.slug}`}
-                className="group flex min-w-0 items-start gap-3 rounded-2xl border border-line bg-white/90 p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-lift"
+                className="group flex min-w-0 items-start gap-3 rounded-lg border border-line bg-white p-4 transition-colors hover:border-gold-600"
               >
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-gold-100 to-cyan-100 text-gold-600">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-gold-100 text-gold-600">
                   <Icon className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <div className="min-w-0 flex-1">
@@ -180,9 +180,9 @@ export default function HomePage() {
 
           <div className="mt-10 grid gap-3 md:grid-cols-3">
             {STEPS.map(({ icon: Icon, step, title, description }) => (
-              <div key={step} className="rounded-2xl border border-line bg-white p-5 shadow-sm">
+              <div key={step} className="rounded-lg border border-line bg-white p-5">
                 <div className="flex items-center justify-between">
-                  <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-100 to-blue-100 text-blue-800">
+                  <span className="grid h-11 w-11 place-items-center rounded-md bg-cream text-navy">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <span className="font-serif text-sm font-semibold text-gold-600">{step}</span>
@@ -193,7 +193,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-2xl border border-line bg-gradient-to-r from-blue-50 to-cyan-50 p-4 text-xs text-muted">
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-lg border border-line bg-cream p-4 text-xs text-muted">
             <span className="flex items-center gap-2 font-medium text-ink">
               <MapPin className="h-4 w-4 text-sky-700" aria-hidden="true" /> Popular cities
             </span>

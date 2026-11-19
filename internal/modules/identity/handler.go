@@ -468,19 +468,54 @@ func (h *Handler) Refresh(c *gin.Context) {
 
 	hash := auth.HashRefreshToken(rawToken)
 	var user *sqlcgen.User
-	err := h.store.WithTx(c.Request.Context(), func(_ pgx.Tx) error {
+	err := h.store.WithTx(c.Request.Context(), func(tx pgx.Tx) error {
 		sess, ok := h.store.RefreshSessions[hash]
 		if !ok || sess.RevokedAt != nil || time.Now().UTC().After(sess.ExpiresAt) {
-			return shared.NewUnauthorized("Refresh session is invalid or expired.")
-		}
-		now := time.Now().UTC()
-		sess.RevokedAt = &now
+			// Refresh sessions may outlive an API process restart. Recover and validate
+			// the opaque token from PostgreSQL when it is not present in memory.
+			if h.store.Pool == nil {
+				return shared.NewUnauthorized("Refresh session is invalid or expired.")
+			}
+			var userID uuid.UUID
+			var expiresAt time.Time
+			qErr := h.store.Pool.QueryRow(c.Request.Context(), `
+				SELECT user_id, expires_at
+				FROM refresh_sessions
+				WHERE token_hash = $1 AND revoked_at IS NULL
+				LIMIT 1
+			`, hash).Scan(&userID, &expiresAt)
+			if qErr != nil || time.Now().UTC().After(expiresAt) {
+				return shared.NewUnauthorized("Refresh session is invalid or expired.")
+			}
+			for _, candidate := range h.store.Users {
+				if candidate.ID == userID {
+					if !candidate.IsActive {
+						return shared.NewUnauthorized("User account is no longer active.")
+					}
+					user = candidate
+					break
+				}
+			}
+			if user == nil {
+				return shared.NewUnauthorized("Refresh session is invalid or expired.")
+			}
+		} else {
+			now := time.Now().UTC()
+			sess.RevokedAt = &now
 
-		u, exists := h.store.Users[sess.UserID]
-		if !exists || !u.IsActive {
-			return shared.NewUnauthorized("User account is no longer active.")
+			u, exists := h.store.Users[sess.UserID]
+			if !exists || !u.IsActive {
+				return shared.NewUnauthorized("User account is no longer active.")
+			}
+			user = u
 		}
-		user = u
+		if tx != nil {
+			_, _ = tx.Exec(c.Request.Context(), `
+				UPDATE refresh_sessions
+				SET revoked_at = COALESCE(revoked_at, NOW())
+				WHERE token_hash = $1
+			`, hash)
+		}
 		return nil
 	})
 	if err != nil {
@@ -500,10 +535,17 @@ func (h *Handler) Refresh(c *gin.Context) {
 func (h *Handler) Logout(c *gin.Context) {
 	if cookie, err := c.Cookie("le_refresh_token"); err == nil && cookie != "" {
 		hash := auth.HashRefreshToken(cookie)
-		_ = h.store.WithTx(c.Request.Context(), func(_ pgx.Tx) error {
+		_ = h.store.WithTx(c.Request.Context(), func(tx pgx.Tx) error {
 			if sess, ok := h.store.RefreshSessions[hash]; ok {
 				now := time.Now().UTC()
 				sess.RevokedAt = &now
+			}
+			if tx != nil {
+				_, _ = tx.Exec(c.Request.Context(), `
+					UPDATE refresh_sessions
+					SET revoked_at = COALESCE(revoked_at, NOW())
+					WHERE token_hash = $1
+				`, hash)
 			}
 			return nil
 		})
@@ -606,7 +648,7 @@ func (h *Handler) issueSessionResponse(c *gin.Context, status int, u *sqlcgen.Us
 		return
 	}
 
-	_ = h.store.WithTx(c.Request.Context(), func(_ pgx.Tx) error {
+	_ = h.store.WithTx(c.Request.Context(), func(tx pgx.Tx) error {
 		h.store.RefreshSessions[refreshHash] = &sqlcgen.RefreshSession{
 			ID:        uuid.New(),
 			UserID:    u.ExternalID,
@@ -615,6 +657,16 @@ func (h *Handler) issueSessionResponse(c *gin.Context, status int, u *sqlcgen.Us
 			IPAddress: c.ClientIP(),
 			ExpiresAt: refreshExp,
 			CreatedAt: time.Now().UTC(),
+		}
+		if tx != nil {
+			_, _ = tx.Exec(c.Request.Context(), `
+				INSERT INTO refresh_sessions
+					(id, user_id, token_hash, user_agent, ip_address, expires_at, created_at)
+				VALUES ($1, $2, $3, $4, $5, $6, $7)
+				ON CONFLICT (token_hash) DO NOTHING
+			`,
+				uuid.New(), u.ID, refreshHash,
+				c.Request.UserAgent(), c.ClientIP(), refreshExp, time.Now().UTC())
 		}
 		return nil
 	})

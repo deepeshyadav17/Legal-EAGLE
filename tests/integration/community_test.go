@@ -84,7 +84,7 @@ func TestCommunityMessagesValidateContentAndReviewStatus(t *testing.T) {
 		t.Fatalf("invalid review status should be rejected, got %d: %s", w.Code, w.Body.String())
 	}
 
-	func TestDemoAccountsCannotAuthenticateInProduction(t *testing.T) {
+	t.Run("Demo accounts cannot authenticate in production", func(t *testing.T) {
 		cfg := config.Load()
 		cfg.AppEnv = "production"
 		cfg.DatabaseURL = ""
@@ -109,7 +109,7 @@ func TestCommunityMessagesValidateContentAndReviewStatus(t *testing.T) {
 		if w.Code != http.StatusUnauthorized {
 			t.Fatalf("seeded demo credentials should be rejected in production, got %d: %s", w.Code, w.Body.String())
 		}
-	}
+	})
 
 	for _, submission := range []struct {
 		token string
